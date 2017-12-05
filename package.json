@@ -1,12 +1,12 @@
 {
-  "name": "video-thumbnail-generator",
+  "name": "video-thumbnail-generator-for-cloud-functions",
   "version": "1.1.2",
   "description": "Package to generate a thumbail for an mp4 video",
   "main": "build/index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sh8/video-thumbnail-generator"
+    "url": "https://github.com/sh8/video-thumbnail-generator-for-cloud-functions"
   },
   "scripts": {
     "compile": "./node_modules/.bin/gulp build",
