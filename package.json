@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/volumenetwork/video-thumbnail-generator"
+    "url": "https://github.com/sh8/video-thumbnail-generator"
   },
   "scripts": {
     "compile": "./node_modules/.bin/gulp build",
