@@ -1,4 +1,4 @@
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg'
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import FfmpegCommand from 'fluent-ffmpeg';
 import Promise from 'bluebird';
 import _ from 'lodash';
@@ -28,7 +28,7 @@ export default class ThumbnailGenerator {
     this.tmpDir = opts.tmpDir || '/tmp';
 
     // by include deps here, it is easier to mock them out
-    FfmpegCommand.setFfmpegPath(ffmpegInstaller.path)
+    FfmpegCommand.setFfmpegPath(ffmpegInstaller.path);
     this.FfmpegCommand = FfmpegCommand;
     this.del = del;
   }
