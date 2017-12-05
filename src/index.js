@@ -1,4 +1,5 @@
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import ffproveInstaller from '@ffprobe-installer/ffprobe';
 import FfmpegCommand from 'fluent-ffmpeg';
 import Promise from 'bluebird';
 import _ from 'lodash';
@@ -29,6 +30,7 @@ export default class ThumbnailGenerator {
 
     // by include deps here, it is easier to mock them out
     FfmpegCommand.setFfmpegPath(ffmpegInstaller.path);
+    FfmpegCommand.setFfprobePath(ffproveInstaller.path);
     this.FfmpegCommand = FfmpegCommand;
     this.del = del;
   }
