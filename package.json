@@ -1,5 +1,5 @@
 {
-  "name": "video-thumbnail-generator-for-cloud-functions",
+  "name": "@openquantum/video-thumbnail-generator-for-cloud-functions",
   "version": "1.1.5",
   "description": "Package to generate a thumbail for an mp4 video",
   "main": "build/index.js",
@@ -9,11 +9,11 @@
     "url": "https://github.com/sh8/video-thumbnail-generator-for-cloud-functions"
   },
   "scripts": {
-    "compile": "./node_modules/.bin/gulp build",
-    "clean": "./node_modules/.bin/gulp clean",
-    "watch": "./node_modules/.bin/gulp watch",
-    "test": "./node_modules/.bin/gulp test",
-    "prepublish": "./node_modules/.bin/gulp prepublish"
+    "compile": "gulp build",
+    "clean": "gulp clean",
+    "watch": "gulp watch",
+    "test": "gulp test",
+    "prepublish": "gulp prepublish"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
