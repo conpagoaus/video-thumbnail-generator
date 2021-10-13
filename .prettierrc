@@ -1,10 +1,10 @@
 {
   "endOfLine": "lf",
-  "semi": false,
+  "semi": true,
   "camelcase": false,
   "new-cap": false,
   "singleQuote": true,
   "tabWidth": 2,
-  "trailingComma": "es5",
+  "trailingComma": "all",
   "printWidth": 80
 }

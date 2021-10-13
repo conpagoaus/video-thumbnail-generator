@@ -1,8 +1,6 @@
 {
-  "extends": "airbnb",
-  "plugins": [
-    "mocha"
-  ],
+  "extends": "airbnb-base",
+  "plugins": ["mocha"],
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module",
@@ -19,4 +17,3 @@
     "node": true
   }
 }
-

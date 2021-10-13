@@ -4,6 +4,7 @@
   "description": "Package to generate a thumbail for an mp4 video",
   "main": "build/index.js",
   "license": "MIT",
+  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/sh8/video-thumbnail-generator-for-cloud-functions"
@@ -23,12 +24,10 @@
     "@babel/register": "^7.15.3",
     "babel-plugin-istanbul": "^6.0.0",
     "chai": "4.3.4",
-    "eslint": "^8.0.0",
-    "eslint-config-airbnb": "18.2.1",
-    "eslint-plugin-import": "2.25.2",
-    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-mocha": "9.0.0",
-    "eslint-plugin-react": "7.26.1",
     "gulp": "4.0.2",
     "gulp-babel": "8.0.0",
     "gulp-babel-istanbul": "1.6.0",

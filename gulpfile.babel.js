@@ -20,8 +20,8 @@ paths.buildFiles = [`${paths.buildDir}/**/*.js`]
 /**
  * Task to remove assets from last build
  */
-gulp.task('clean', (done) => {
-  del(['build'], done)
+gulp.task('clean', () => {
+  return del([paths.buildDir])
 })
 
 /**
@@ -106,7 +106,7 @@ gulp.task(
 /**
  * Task to watch the files whilst developing
  */
-gulp.task('watch', () => gulp.watch(paths.sourceFiles, ['build']))
+gulp.task('watch', () => gulp.watch(paths.sourceFiles, gulp.series('build')))
 
 gulp.task('prebuild', gulp.series('clean', 'lint'))
 gulp.task('default', gulp.series('prebuild', 'build'))
