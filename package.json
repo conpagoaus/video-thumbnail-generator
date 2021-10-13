@@ -1,6 +1,6 @@
 {
   "name": "video-thumbnail-generator-for-cloud-functions",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Package to generate a thumbail for an mp4 video",
   "main": "build/index.js",
   "license": "MIT",
@@ -43,12 +43,12 @@
     "sinon-chai": "2.9.0"
   },
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.0.13",
-    "@ffprobe-installer/ffprobe": "^1.0.8",
-    "bluebird": "3.5.0",
-    "del": "2.2.2",
-    "fluent-ffmpeg": "2.1.0",
-    "lodash": "4.17.4",
-    "moment": "2.18.1"
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^1.2.0",
+    "bluebird": "3.7.2",
+    "del": "6.0.0",
+    "fluent-ffmpeg": "2.1.2",
+    "lodash": "4.17.21",
+    "moment": "2.29.1"
   }
 }
