@@ -6,8 +6,8 @@
 ## Quick Start
 
 ```js
-import ThumbnailGenerator from 'volume-thumbnail-generator';
-// const ThumbnailGenerator = require('volume-thumbnail-generator').default;
+import ThumbnailGenerator from 'video-thumbnail-generator-for-cloud-functions';
+// const ThumbnailGenerator = require('video-thumbnail-generator-for-cloud-functions').default;
 
 const tg = new ThumbnailGenerator({
   sourcePath: '/tmp/test.mp4',
@@ -26,12 +26,12 @@ tg.generate()
   //  'test-thumbnail-320x240-0007.png',
   //  'test-thumbnail-320x240-0008.png',
   //  'test-thumbnail-320x240-0009.png',
-  //  'test-thumbnail-320x240-0010.png' ]  
+  //  'test-thumbnail-320x240-0010.png' ]
 
 tg.generateOneByPercent(90)
   .then(console.log);
   // 'test-thumbnail-320x240-0001.png'
- 
+
 tg.generateCb((err, result) => {
   console.log(result);
   // [ 'test-thumbnail-320x240-0001.png',
@@ -43,7 +43,7 @@ tg.generateCb((err, result) => {
   //  'test-thumbnail-320x240-0007.png',
   //  'test-thumbnail-320x240-0008.png',
   //  'test-thumbnail-320x240-0009.png',
-  //  'test-thumbnail-320x240-0010.png' ]  
+  //  'test-thumbnail-320x240-0010.png' ]
 });
 
 tg.generateOneByPercentCb(90, (err, result) => {
@@ -69,47 +69,49 @@ There are options that can be passed when generating thumbnails. Both `Thumbnail
 
 ```js
 tg.generate({
-  size: '200x200'
-})
-  .then(console.log);
-  // [ 'test-thumbnail-200x200-0001.png',
-  //  'test-thumbnail-200x200-0002.png',
-  //  'test-thumbnail-200x200-0003.png',
-  //  'test-thumbnail-200x200-0004.png',
-  //  'test-thumbnail-200x200-0005.png',
-  //  'test-thumbnail-200x200-0006.png',
-  //  'test-thumbnail-200x200-0007.png',
-  //  'test-thumbnail-200x200-0008.png',
-  //  'test-thumbnail-200x200-0009.png',
-  //  'test-thumbnail-200x200-0010.png' ]
+  size: "200x200",
+}).then(console.log);
+// [ 'test-thumbnail-200x200-0001.png',
+//  'test-thumbnail-200x200-0002.png',
+//  'test-thumbnail-200x200-0003.png',
+//  'test-thumbnail-200x200-0004.png',
+//  'test-thumbnail-200x200-0005.png',
+//  'test-thumbnail-200x200-0006.png',
+//  'test-thumbnail-200x200-0007.png',
+//  'test-thumbnail-200x200-0008.png',
+//  'test-thumbnail-200x200-0009.png',
+//  'test-thumbnail-200x200-0010.png' ]
 
-
-tg.generateCb({
-  size: '200x200'
-}, (err, result) => {
-  console.log(result);
-  // [ 'test-thumbnail-200x200-0001.png',
-  //  'test-thumbnail-200x200-0002.png',
-  //  'test-thumbnail-200x200-0003.png',
-  //  'test-thumbnail-200x200-0004.png',
-  //  'test-thumbnail-200x200-0005.png',
-  //  'test-thumbnail-200x200-0006.png',
-  //  'test-thumbnail-200x200-0007.png',
-  //  'test-thumbnail-200x200-0008.png',
-  //  'test-thumbnail-200x200-0009.png',
-  //  'test-thumbnail-200x200-0010.png' ]    
-});
+tg.generateCb(
+  {
+    size: "200x200",
+  },
+  (err, result) => {
+    console.log(result);
+    // [ 'test-thumbnail-200x200-0001.png',
+    //  'test-thumbnail-200x200-0002.png',
+    //  'test-thumbnail-200x200-0003.png',
+    //  'test-thumbnail-200x200-0004.png',
+    //  'test-thumbnail-200x200-0005.png',
+    //  'test-thumbnail-200x200-0006.png',
+    //  'test-thumbnail-200x200-0007.png',
+    //  'test-thumbnail-200x200-0008.png',
+    //  'test-thumbnail-200x200-0009.png',
+    //  'test-thumbnail-200x200-0010.png' ]
+  }
+);
 ```
+
 The `opts` above can take anything that options in [fluent-ffmpeg's Screenshots allow](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#screenshotsoptions-dirname-generate-thumbnails)
 
-
 ### When generating gifs
+
 ```js
 tg.generateGif({
-   fps: 0.75, //how many frames per second you want in your gif
-   scale: 180, //the smaller the number, the smaller the thumbnail
-   speedMultiple: 4, //this is 4x speed
-   deletePalette: true //to delete the palettefile that was generated to create the gif once gif is created 
+  fps: 0.75, //how many frames per second you want in your gif
+  scale: 180, //the smaller the number, the smaller the thumbnail
+  speedMultiple: 4, //this is 4x speed
+  deletePalette: true, //to delete the palettefile that was generated to create the gif once gif is created
 });
 ```
 
