@@ -1,8 +1,5 @@
 # Video Thumbnail Generator
 
-[![Build Status](https://travis-ci.org/volumenetwork/video-thumbnail-generator.svg?branch=master)](https://travis-ci.org/volumenetwork/video-thumbnail-generator)
-![david-dm](https://david-dm.org/volumenetwork/video-thumbnail-generator.svg)
-
 ## Quick Start
 
 ```js
@@ -116,8 +113,3 @@ tg.generateGif({
 ```
 
 ## Tests
-
-`./node_modules/.bin/gulp test`
-
-Else, if you want to run with a code coverage report:
-`./node_modules/.bin/gulp test:coverage`

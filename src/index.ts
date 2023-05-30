@@ -1,13 +1,9 @@
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffproveInstaller from '@ffprobe-installer/ffprobe';
 import FfmpegCommand from 'fluent-ffmpeg';
-import Promise from 'bluebird';
 import _ from 'lodash';
 import del from 'del';
 
-/**
- * @class ThumbnailGenerator
- */
 export default class ThumbnailGenerator {
   /**
    * @constructor
@@ -19,7 +15,7 @@ export default class ThumbnailGenerator {
    * @param {String} [opts.size]
    * @param {Logger} [opts.logger]
    */
-  constructor(opts) {
+  constructor(opts: { sourcePath: any; thumbnailPath: any; count: number; percent: any; logger: null; size: string; tmpDir: string; }) {
     this.sourcePath = opts.sourcePath;
     this.thumbnailPath = opts.thumbnailPath;
     this.count = opts.count || 10;
@@ -43,7 +39,7 @@ export default class ThumbnailGenerator {
    *
    * @private
    */
-  getFfmpegInstance() {
+  getFfmpegInstance(): FfmpegCommand {
     return new this.FfmpegCommand({
       source: this.sourcePath,
       logger: this.logger,
@@ -66,7 +62,7 @@ export default class ThumbnailGenerator {
    *
    * @async
    */
-  generateOneByPercent(percent, opts) {
+  async generateOneByPercent(percent: number, opts: object): Promise<any> {
     if (percent < 0 || percent > 100) {
       return Promise.reject(new Error('Percent must be a value from 0-100'));
     }
@@ -76,7 +72,8 @@ export default class ThumbnailGenerator {
       timestamps: [`${percent}%`],
     });
 
-    return this.generate(settings).then((result) => result.pop());
+    const result = await this.generate(settings);
+    return result.pop();
   }
 
   /**
@@ -94,7 +91,7 @@ export default class ThumbnailGenerator {
    *
    * @async
    */
-  generateOneByPercentCb(percent, opts, cb) {
+  generateOneByPercentCb(percent: number, opts: object, cb: Function): Void {
     const callback = cb || opts;
 
     this.generateOneByPercent(percent, opts)
@@ -118,7 +115,7 @@ export default class ThumbnailGenerator {
    *
    * @async
    */
-  generate(opts) {
+  generate(opts: any): Promise<any> {
     const defaultSettings = {
       folder: this.thumbnailPath,
       count: this.count,
@@ -129,14 +126,14 @@ export default class ThumbnailGenerator {
 
     const ffmpeg = this.getFfmpegInstance();
     const settings = _.assignIn(defaultSettings, opts);
-    let filenameArray = [];
+    let filenameArray: never[] = [];
 
     return new Promise((resolve, reject) => {
       function complete() {
         resolve(filenameArray);
       }
 
-      function filenames(fns) {
+      function filenames(fns: any[]) {
         filenameArray = fns;
       }
 
@@ -165,7 +162,7 @@ export default class ThumbnailGenerator {
    *
    * @async
    */
-  generateCb(opts, cb) {
+  generateCb(opts: any, cb: Function): Void {
     const callback = cb || opts;
 
     this.generate(opts)
@@ -187,7 +184,7 @@ export default class ThumbnailGenerator {
    *
    * @public
    */
-  generatePalette(opts) {
+  generatePalette(opts: undefined): Promise<any> {
     const ffmpeg = this.getFfmpegInstance();
     const defaultOpts = {
       videoFilters: 'fps=10,scale=320:-1:flags=lanczos,palettegen',
@@ -235,7 +232,7 @@ export default class ThumbnailGenerator {
    *
    * @public
    */
-  generatePaletteCb(opts, cb) {
+  generatePaletteCb(opts: any, cb: Function): Promise<any> {
     const callback = cb || opts;
 
     this.generatePalette(opts)
@@ -257,7 +254,7 @@ export default class ThumbnailGenerator {
    *
    * @public
    */
-  generateGif(opts) {
+  async generateGif(opts: any): Promise<any> {
     const ffmpeg = this.getFfmpegInstance();
     const defaultOpts = {
       fps: 0.75,
@@ -266,7 +263,7 @@ export default class ThumbnailGenerator {
       deletePalette: true,
     };
     const conf = _.assignIn(defaultOpts, opts);
-    const inputOptions = [];
+    const inputOptions: string[] = [];
     const outputOptions = [
       `-filter_complex fps=${conf.fps},setpts=(1/${conf.speedMultiplier})*PTS,scale=${conf.scale}:-1:flags=lanczos[x];[x][1:v]paletteuse`,
     ];
@@ -274,7 +271,7 @@ export default class ThumbnailGenerator {
     const output = `${this.thumbnailPath}/${outputFileName}`;
     const d = this.del;
 
-    function createGif(paletteFilePath) {
+    function createGif(paletteFilePath: any) {
       if (conf.offset) {
         inputOptions.push(`-ss ${conf.offset}`);
       }
@@ -305,7 +302,8 @@ export default class ThumbnailGenerator {
       });
     }
 
-    return this.generatePalette().then(createGif);
+    const paletteFilePath_1 = await this.generatePalette();
+    return createGif(paletteFilePath_1);
   }
 
   /**
@@ -321,7 +319,7 @@ export default class ThumbnailGenerator {
    *
    * @public
    */
-  generateGifCb(opts, cb) {
+  generateGifCb(opts: any, cb: Function) {
     const callback = cb || opts;
 
     this.generateGif(opts)
