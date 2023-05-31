@@ -1,6 +1,6 @@
 {
-  "name": "@conpagoaus/video-thumbnail-generator",
-  "version": "2.0.0",
+  "name": "@conpago/video-thumbnail-generator",
+  "version": "2.0.2",
   "description": "Package to generate a thumbail for an mp4 video",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -14,7 +14,7 @@
     "compile": "tsc -p tsconfig.json",
     "test": "vitest run",
     "prepare": "yarn compile",
-    "postinstall": "npx tsc -p tsconfig.json"
+    "publish": "npm publish --access public"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
