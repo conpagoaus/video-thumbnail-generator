@@ -1,10 +1,30 @@
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
-import ffproveInstaller from '@ffprobe-installer/ffprobe';
-import FfmpegCommand from 'fluent-ffmpeg';
-import _ from 'lodash';
-import del from 'del';
+import ffmpeg from "fluent-ffmpeg";
+import _ from "lodash";
+import * as stream from "stream";
+import { deleteSync } from "del";
+
+interface CmdOptions {
+  fps?: number;
+  scale?: number;
+  speedMultiplier?: number;
+  deletePalette?: boolean;
+  offset?: number;
+  duration?: number;
+  videoFilters?: string;
+  fileName?: string;
+}
 
 export default class ThumbnailGenerator {
+  sourcePath: string | stream.Readable | undefined;
+  thumbnailPath: string;
+  count: number;
+  percent: string;
+  logger: null;
+  size: string;
+  fileNameFormat: string;
+  tmpDir: string;
+  // FfmpegCommand: typeof FfmpegCommand;
+
   /**
    * @constructor
    *
@@ -15,34 +35,33 @@ export default class ThumbnailGenerator {
    * @param {String} [opts.size]
    * @param {Logger} [opts.logger]
    */
-  constructor(opts: { sourcePath: any; thumbnailPath: any; count: number; percent: any; logger: null; size: string; tmpDir: string; }) {
+  constructor(opts: {
+    sourcePath: string | stream.Readable | undefined;
+    thumbnailPath: string;
+    count?: number;
+    percent?: string;
+    logger?: null;
+    size?: string;
+    tmpDir?: string;
+  }) {
     this.sourcePath = opts.sourcePath;
     this.thumbnailPath = opts.thumbnailPath;
     this.count = opts.count || 10;
-    this.percent = `${opts.percent}%` || '90%';
+    this.percent = `${opts.percent}%` || "90%";
     this.logger = opts.logger || null;
-    this.size = opts.size || '320x240';
-    this.fileNameFormat = '%b-thumbnail-%r-%000i';
-    this.tmpDir = opts.tmpDir || '/tmp';
+    this.size = opts.size || "320x240";
+    this.fileNameFormat = "%b-thumbnail-%r-%000i";
+    this.tmpDir = opts.tmpDir || "/tmp";
 
-    // by include deps here, it is easier to mock them out
-    FfmpegCommand.setFfmpegPath(ffmpegInstaller.path);
-    FfmpegCommand.setFfprobePath(ffproveInstaller.path);
-    this.FfmpegCommand = FfmpegCommand;
-    this.del = del;
+    // by including deps here, it is easier to mock them out
+    // FfmpegCommand.setFfmpegPath(ffmpegInstaller.path);
+    // FfmpegCommand.setFfprobePath(ffproveInstaller.path);
+    // this.FfmpegCommand = FfmpegCommand;
   }
 
-  /**
-   * @method getFfmpegInstance
-   *
-   * @return {FfmpegCommand}
-   *
-   * @private
-   */
-  getFfmpegInstance(): FfmpegCommand {
-    return new this.FfmpegCommand({
+  getFfmpegInstance(): ffmpeg.FfmpegCommand {
+    return ffmpeg({
       source: this.sourcePath,
-      logger: this.logger,
     });
   }
 
@@ -62,9 +81,16 @@ export default class ThumbnailGenerator {
    *
    * @async
    */
-  async generateOneByPercent(percent: number, opts: object): Promise<any> {
+  async generateOneByPercent(
+    percent: number,
+    opts?: {
+      folder: string;
+      filename?: string;
+      size?: string;
+    }
+  ): Promise<any> {
     if (percent < 0 || percent > 100) {
-      return Promise.reject(new Error('Percent must be a value from 0-100'));
+      return Promise.reject(new Error("Percent must be a value from 0-100"));
     }
 
     const settings = _.assignIn(opts, {
@@ -74,29 +100,6 @@ export default class ThumbnailGenerator {
 
     const result = await this.generate(settings);
     return result.pop();
-  }
-
-  /**
-   * Method to generate one thumbnail by being given a percentage value.
-   *
-   * @method generateOneByPercentCb
-   *
-   * @param {Number} percent
-   * @param {Object} [opts]
-   * @param {Function} cb (err, string)
-   *
-   * @return {Void}
-   *
-   * @public
-   *
-   * @async
-   */
-  generateOneByPercentCb(percent: number, opts: object, cb: Function): Void {
-    const callback = cb || opts;
-
-    this.generateOneByPercent(percent, opts)
-      .then((result) => callback(null, result))
-      .catch(callback);
   }
 
   /**
@@ -115,7 +118,11 @@ export default class ThumbnailGenerator {
    *
    * @async
    */
-  generate(opts: any): Promise<any> {
+  generate(opts?: {
+    count: number;
+    filename?: string;
+    size?: string;
+  }): Promise<any[]> {
     const defaultSettings = {
       folder: this.thumbnailPath,
       count: this.count,
@@ -126,7 +133,7 @@ export default class ThumbnailGenerator {
 
     const ffmpeg = this.getFfmpegInstance();
     const settings = _.assignIn(defaultSettings, opts);
-    let filenameArray: never[] = [];
+    let filenameArray: any[] = [];
 
     return new Promise((resolve, reject) => {
       function complete() {
@@ -138,36 +145,11 @@ export default class ThumbnailGenerator {
       }
 
       ffmpeg
-        .on('filenames', filenames)
-        .on('end', complete)
-        .on('error', reject)
+        .on("filenames", filenames)
+        .on("end", complete)
+        .on("error", reject)
         .screenshots(settings);
     });
-  }
-
-  /**
-   * Method to generate thumbnails
-   *
-   * @method generateCb
-   *
-   * @param {String} [opts.folder]
-   * @param {Number} [opts.count]
-   * @param {String} [opts.size] - 'i.e. 320x320'
-   * @param {String} [opts.filename]
-   * @param {Function} cb - (err, array)
-   *
-   * @return {Void}
-   *
-   * @public
-   *
-   * @async
-   */
-  generateCb(opts: any, cb: Function): Void {
-    const callback = cb || opts;
-
-    this.generate(opts)
-      .then((result) => callback(null, result))
-      .catch(callback);
   }
 
   /**
@@ -180,17 +162,19 @@ export default class ThumbnailGenerator {
    * @param {string} [opts.duration]
    * @param {string} [opts.videoFilters]
    *
-   * @return {Promise}
-   *
    * @public
    */
-  generatePalette(opts: undefined): Promise<any> {
+  generatePalette(opts?: {
+    offset?: number;
+    duration?: number;
+    videoFilters?: string;
+  }): Promise<string> {
     const ffmpeg = this.getFfmpegInstance();
-    const defaultOpts = {
-      videoFilters: 'fps=10,scale=320:-1:flags=lanczos,palettegen',
+    const defaultOpts: CmdOptions = {
+      videoFilters: "fps=10,scale=320:-1:flags=lanczos,palettegen",
     };
     const conf = _.assignIn(defaultOpts, opts);
-    const inputOptions = ['-y'];
+    const inputOptions = ["-y"];
     const outputOptions = [`-vf ${conf.videoFilters}`];
     const output = `${this.tmpDir}/palette-${Date.now()}.png`;
 
@@ -210,34 +194,11 @@ export default class ThumbnailGenerator {
       ffmpeg
         .inputOptions(inputOptions)
         .outputOptions(outputOptions)
-        .on('end', complete)
-        .on('error', reject)
+        .on("end", complete)
+        .on("error", reject)
         .output(output)
         .run();
     });
-  }
-
-  /**
-   * Method to generate the palette from a video (required for creating gifs)
-   *
-   * @method generatePaletteCb
-   *
-   * @param {string} [opts.videoFilters]
-   * @param {string} [opts.offset]
-   * @param {string} [opts.duration]
-   * @param {string} [opts.videoFilters]
-   * @param {Function} cb - (err, array)
-   *
-   * @return {Promise}
-   *
-   * @public
-   */
-  generatePaletteCb(opts: any, cb: Function): Promise<any> {
-    const callback = cb || opts;
-
-    this.generatePalette(opts)
-      .then((result) => callback(null, result))
-      .catch(callback);
   }
 
   /**
@@ -254,9 +215,14 @@ export default class ThumbnailGenerator {
    *
    * @public
    */
-  async generateGif(opts: any): Promise<any> {
+  async generateGif(opts?: {
+    fps?: number;
+    scale?: number;
+    speedMultiplier?: number;
+    deletePalette?: boolean;
+  }): Promise<string> {
     const ffmpeg = this.getFfmpegInstance();
-    const defaultOpts = {
+    const defaultOpts: CmdOptions = {
       fps: 0.75,
       scale: 180,
       speedMultiplier: 4,
@@ -269,61 +235,36 @@ export default class ThumbnailGenerator {
     ];
     const outputFileName = conf.fileName || `video-${Date.now()}.gif`;
     const output = `${this.thumbnailPath}/${outputFileName}`;
-    const d = this.del;
 
-    function createGif(paletteFilePath: any) {
-      if (conf.offset) {
-        inputOptions.push(`-ss ${conf.offset}`);
-      }
+    const paletteFilePath = await this.generatePalette();
 
-      if (conf.duration) {
-        inputOptions.push(`-t ${conf.duration}`);
-      }
-
-      return new Promise((resolve, reject) => {
-        outputOptions.unshift(`-i ${paletteFilePath}`);
-
-        function complete() {
-          if (conf.deletePalette === true) {
-            d.sync([paletteFilePath], {
-              force: true,
-            });
-          }
-          resolve(output);
-        }
-
-        ffmpeg
-          .inputOptions(inputOptions)
-          .outputOptions(outputOptions)
-          .on('end', complete)
-          .on('error', reject)
-          .output(output)
-          .run();
-      });
+    if (conf.offset) {
+      inputOptions.push(`-ss ${conf.offset}`);
     }
 
-    const paletteFilePath_1 = await this.generatePalette();
-    return createGif(paletteFilePath_1);
-  }
+    if (conf.duration) {
+      inputOptions.push(`-t ${conf.duration}`);
+    }
 
-  /**
-   * Method to create a short gif thumbnail from an mp4 video
-   *
-   * @method generateGifCb
-   *
-   * @param {Number} opts.fps
-   * @param {Number} opts.scale
-   * @param {Number} opts.speedMultiple
-   * @param {Boolean} opts.deletePalette
-   * @param {Function} cb - (err, array)
-   *
-   * @public
-   */
-  generateGifCb(opts: any, cb: Function) {
-    const callback = cb || opts;
+    return new Promise((resolve, reject) => {
+      outputOptions.unshift(`-i ${paletteFilePath}`);
 
-    this.generateGif(opts)
-      .then((result) => callback(null, result))
-      .catch(callback);
+      function complete() {
+        if (conf.deletePalette === true) {
+          deleteSync([paletteFilePath], {
+            force: true,
+          });
+        }
+        resolve(output);
+      }
+
+      ffmpeg
+        .inputOptions(inputOptions)
+        .outputOptions(outputOptions)
+        .on("end", complete)
+        .on("error", reject)
+        .output(output)
+        .run();
+    });
   }
 }
