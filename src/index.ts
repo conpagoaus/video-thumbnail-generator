@@ -1,6 +1,6 @@
 import ffmpeg from "fluent-ffmpeg";
-import _ from "lodash";
-import * as stream from "stream";
+import { assignIn } from "lodash";
+import { Readable } from "stream";
 import { deleteSync } from "del";
 
 interface CmdOptions {
@@ -15,7 +15,7 @@ interface CmdOptions {
 }
 
 export default class ThumbnailGenerator {
-  sourcePath: string | stream.Readable | undefined;
+  sourcePath: string | Readable | undefined;
   thumbnailPath: string;
   count: number;
   percent: string;
@@ -36,7 +36,7 @@ export default class ThumbnailGenerator {
    * @param {Logger} [opts.logger]
    */
   constructor(opts: {
-    sourcePath: string | stream.Readable | undefined;
+    sourcePath: string | Readable | undefined;
     thumbnailPath: string;
     count?: number;
     percent?: string;
@@ -52,11 +52,6 @@ export default class ThumbnailGenerator {
     this.size = opts.size || "320x240";
     this.fileNameFormat = "%b-thumbnail-%r-%000i";
     this.tmpDir = opts.tmpDir || "/tmp";
-
-    // by including deps here, it is easier to mock them out
-    // FfmpegCommand.setFfmpegPath(ffmpegInstaller.path);
-    // FfmpegCommand.setFfprobePath(ffproveInstaller.path);
-    // this.FfmpegCommand = FfmpegCommand;
   }
 
   getFfmpegInstance(): ffmpeg.FfmpegCommand {
@@ -88,12 +83,12 @@ export default class ThumbnailGenerator {
       filename?: string;
       size?: string;
     }
-  ): Promise<any> {
+  ): Promise<string | undefined> {
     if (percent < 0 || percent > 100) {
       return Promise.reject(new Error("Percent must be a value from 0-100"));
     }
 
-    const settings = _.assignIn(opts, {
+    const settings = assignIn(opts, {
       count: 1,
       timestamps: [`${percent}%`],
     });
@@ -122,7 +117,7 @@ export default class ThumbnailGenerator {
     count: number;
     filename?: string;
     size?: string;
-  }): Promise<any[]> {
+  }): Promise<string[]> {
     const defaultSettings = {
       folder: this.thumbnailPath,
       count: this.count,
@@ -132,15 +127,15 @@ export default class ThumbnailGenerator {
     };
 
     const ffmpeg = this.getFfmpegInstance();
-    const settings = _.assignIn(defaultSettings, opts);
-    let filenameArray: any[] = [];
+    const settings = assignIn(defaultSettings, opts);
+    let filenameArray: string[] = [];
 
     return new Promise((resolve, reject) => {
       function complete() {
         resolve(filenameArray);
       }
 
-      function filenames(fns: any[]) {
+      function filenames(fns: string[]) {
         filenameArray = fns;
       }
 
@@ -173,7 +168,7 @@ export default class ThumbnailGenerator {
     const defaultOpts: CmdOptions = {
       videoFilters: "fps=10,scale=320:-1:flags=lanczos,palettegen",
     };
-    const conf = _.assignIn(defaultOpts, opts);
+    const conf = assignIn(defaultOpts, opts);
     const inputOptions = ["-y"];
     const outputOptions = [`-vf ${conf.videoFilters}`];
     const output = `${this.tmpDir}/palette-${Date.now()}.png`;
