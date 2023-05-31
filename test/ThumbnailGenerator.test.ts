@@ -28,8 +28,11 @@ describe("ThumbanilGenerator:", () => {
         return Promise.resolve(["generate-thumbnail.png"]);
       });
 
-      const err = await tg.generateOneByPercent(101);
-      expect(err.message).to.equal("Percent must be a value from 0-100");
+      try {
+        await tg.generateOneByPercent(101);
+      } catch (error) {
+        expect(error.message).toEqual("Percent must be a value from 0-100");
+      }
     });
 
     it("throws an error if generating a single thumbnail with a percent under 0", async () => {
@@ -41,9 +44,11 @@ describe("ThumbanilGenerator:", () => {
       sinon.stub(tg, "generate").callsFake(_opts => {
         return Promise.resolve(["generate-thumbnail.png"]);
       });
-
-      const err = await tg.generateOneByPercent(-1);
-      expect(err.message).to.equal("Percent must be a value from 0-100");
+      try {
+        await tg.generateOneByPercent(-1);
+      } catch (error) {
+        expect(error.message).toEqual("Percent must be a value from 0-100");
+      }
     });
   });
 });

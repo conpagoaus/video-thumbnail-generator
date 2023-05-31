@@ -3,16 +3,16 @@
   "version": "2.0.0",
   "description": "Package to generate a thumbail for an mp4 video",
   "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
   "license": "MIT",
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/sh8/video-thumbnail-generator-for-cloud-functions"
+    "url": "https://github.com/conpagoaus/video-thumbnail-generator"
   },
   "scripts": {
     "compile": "tsc -p tsconfig.json",
-    "dev": "",
-    "test": "vitest",
+    "test": "vitest run",
     "prepare": "yarn compile"
   },
   "dependencies": {
