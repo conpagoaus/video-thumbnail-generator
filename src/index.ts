@@ -1,7 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 import { assignIn } from "lodash";
 import { Readable } from "stream";
-import { deleteSync } from "del";
+import { rimrafSync } from "rimraf";
 
 interface CmdOptions {
   fps?: number;
@@ -23,7 +23,6 @@ export default class ThumbnailGenerator {
   size: string;
   fileNameFormat: string;
   tmpDir: string;
-  // FfmpegCommand: typeof FfmpegCommand;
 
   /**
    * @constructor
@@ -70,11 +69,7 @@ export default class ThumbnailGenerator {
    * @param {String} [opts.size] - 'i.e. 320x320'
    * @param {String} [opts.filename]
    *
-   * @return {Promise}
-   *
    * @public
-   *
-   * @async
    */
   async generateOneByPercent(
     percent: number,
@@ -107,11 +102,7 @@ export default class ThumbnailGenerator {
    * @param {String} [opts.size] - 'i.e. 320x320'
    * @param {String} [opts.filename]
    *
-   * @return {Promise}
-   *
    * @public
-   *
-   * @async
    */
   generate(opts?: {
     count: number;
@@ -131,17 +122,13 @@ export default class ThumbnailGenerator {
     let filenameArray: string[] = [];
 
     return new Promise((resolve, reject) => {
-      function complete() {
-        resolve(filenameArray);
-      }
-
       function filenames(fns: string[]) {
         filenameArray = fns;
       }
 
       ffmpeg
         .on("filenames", filenames)
-        .on("end", complete)
+        .on("end", () => resolve(filenameArray))
         .on("error", reject)
         .screenshots(settings);
     });
@@ -159,7 +146,7 @@ export default class ThumbnailGenerator {
    *
    * @public
    */
-  generatePalette(opts?: {
+  private async generatePalette(opts?: {
     offset?: number;
     duration?: number;
     videoFilters?: string;
@@ -174,10 +161,6 @@ export default class ThumbnailGenerator {
     const output = `${this.tmpDir}/palette-${Date.now()}.png`;
 
     return new Promise((resolve, reject) => {
-      function complete() {
-        resolve(output);
-      }
-
       if (conf.offset) {
         inputOptions.push(`-ss ${conf.offset}`);
       }
@@ -189,7 +172,7 @@ export default class ThumbnailGenerator {
       ffmpeg
         .inputOptions(inputOptions)
         .outputOptions(outputOptions)
-        .on("end", complete)
+        .on("end", () => resolve(output))
         .on("error", reject)
         .output(output)
         .run();
@@ -206,8 +189,6 @@ export default class ThumbnailGenerator {
    * @param {Number} opts.speedMultiple
    * @param {Boolean} opts.deletePalette
    *
-   * @return {Promise}
-   *
    * @public
    */
   async generateGif(opts?: {
@@ -223,7 +204,7 @@ export default class ThumbnailGenerator {
       speedMultiplier: 4,
       deletePalette: true,
     };
-    const conf = _.assignIn(defaultOpts, opts);
+    const conf = assignIn(defaultOpts, opts);
     const inputOptions: string[] = [];
     const outputOptions = [
       `-filter_complex fps=${conf.fps},setpts=(1/${conf.speedMultiplier})*PTS,scale=${conf.scale}:-1:flags=lanczos[x];[x][1:v]paletteuse`,
@@ -246,9 +227,7 @@ export default class ThumbnailGenerator {
 
       function complete() {
         if (conf.deletePalette === true) {
-          deleteSync([paletteFilePath], {
-            force: true,
-          });
+          rimrafSync([paletteFilePath]);
         }
         resolve(output);
       }

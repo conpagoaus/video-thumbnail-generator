@@ -4,3 +4,5 @@ build
 test.js
 /dist/
 /yarn-error.log
+*.gif
+*.png

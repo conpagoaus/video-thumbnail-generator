@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import sinon from "sinon";
 import ThumbanilGenerator from "../src/index";
 
-describe("ThumbanilGenerator:", () => {
+describe("ThumbanilGenerator", () => {
   describe("Thumbnail Generation by percent", () => {
     it("can generate a single thumbnail without any options", async () => {
       const tg = new ThumbanilGenerator({

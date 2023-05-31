@@ -18,10 +18,10 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@ffprobe-installer/ffprobe": "^2.0.0",
-    "del": "7.0.0",
     "fluent-ffmpeg": "2.1.2",
     "lodash": "^4.17.21",
-    "moment": "2.29.4"
+    "moment": "2.29.4",
+    "rimraf": "^5.0.1"
   },
   "devDependencies": {
     "@types/fluent-ffmpeg": "^2.1.21",
